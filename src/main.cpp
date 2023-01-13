@@ -138,20 +138,8 @@ void menucommand_01() {
   wire.write( 0b00000000 ); // 18 none
   wire.endTransmission();
 
-  /*
-  wire.beginTransmission( 0x74 );
-  wire.write( 0x24 );
-  wire.write( 0b11111111 );
-  wire.write( 0b11111111 );
-  wire.write( 0b11111111 );
-  wire.write( 0b11111111 );
-  wire.write( 0b11111111 );
-  wire.write( 0b11111111 );
-  wire.write( 0b11111111 );
-  wire.endTransmission();
-  */
 
-    // switch bank to 0
+  // switch bank to 0
   wire.beginTransmission( 0x74 );
   wire.write( 0xFD );
   wire.write( 0x00 );
