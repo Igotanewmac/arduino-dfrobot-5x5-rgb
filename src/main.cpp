@@ -26,6 +26,9 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 #include <pimoroni_11x7matrix.h>
 
 
+#include <Pimoroni_5x5_rgb_matrix.h>
+
+
 
 
 
