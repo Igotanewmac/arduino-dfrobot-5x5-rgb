@@ -49,10 +49,10 @@ void Pimoroni_5x5_rgb_matrix::begin( uint8_t new_i2c_address = 0x75 ) {
     frameDisplayPointerSet( 0x00 );
 
     // clear the buffers
-    pixelBufferClearAll();
+    //pixelBufferClearAll();
 
     // now write them out
-    pixelBufferWriteAllToFrame( 0x00 );
+    //pixelBufferWriteAllToFrame( 0x00 );
 
     // now turn the chip back on.
     softwareShutdownSet( 1 );
@@ -163,6 +163,126 @@ uint8_t Pimoroni_5x5_rgb_matrix::_chipreadbyte( uint8_t framenumber , uint8_t ad
     return (uint8_t)( wire.read() );
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/// @brief Set a pixels power state to on or off.
+/// @param xpos The x position, with 0 at the left.
+/// @param ypos The y position, with 0 at the top.
+/// @param colour The colour bank to set. 0 = red, 1 = blue , 2 = green.
+/// @param state  The on-off state of the pixel. 0 = off, 1 = on.
+void Pimoroni_5x5_rgb_matrix::pixelSet( uint8_t xpos , uint8_t ypos , uint8_t colour , uint8_t state ) {
+
+    // set the pixel state
+    if ( state ) {
+        // if we are turning on...
+        _ledstate[ colour ][ xpos ] |= ( 0b1 << ypos );
+    }
+    else {
+        // if we are turning off...
+        _ledstate[ colour ][ xpos ] &= ~( 0b1 << ypos );
+    }
+
+
+    // all done, return to caller.
+    return;
+
+}
+
+
+
+
+
+
+
+/// @brief Get a pixels power state.
+/// @param xpos The x position, with 0 on the left.
+/// @param ypos The y position, with 0 at the top.
+/// @param colour The colour bank to check. 0 = red, 1 = blue , 2 = green.
+/// @return The on-off state of the pixel, as a uint8_t. 0 = off, 1 = on.
+uint8_t Pimoroni_5x5_rgb_matrix::pixelGet( uint8_t xpos , uint8_t ypos , uint8_t colour ) {
+
+    // just return the right bit.
+    return ( ( _ledstate[ colour ][ xpos ] & ( 0b1 << ypos ) ) >> ypos );
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
