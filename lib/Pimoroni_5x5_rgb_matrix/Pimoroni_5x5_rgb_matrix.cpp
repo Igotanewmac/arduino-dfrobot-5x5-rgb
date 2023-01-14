@@ -256,6 +256,30 @@ uint8_t Pimoroni_5x5_rgb_matrix::pixelGet( uint8_t xpos , uint8_t ypos , uint8_t
 
 
 
+/// @brief Clear the pizel state buffer to all zero.
+void Pimoroni_5x5_rgb_matrix::pixelStateBufferClear() {
+    // hard clear the pixel buffer
+    for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
+        for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
+            _ledstate[ colour ][ xpos ] = 0;
+        }
+    }
+    // all done, return to caller.
+    return;
+}
+
+/// @brief Fills the pixel buffer with a given byte.
+/// @param statebyte The byte to use for fill.  LSB is leftmost pixel. order XXX43210.
+void Pimoroni_5x5_rgb_matrix::pixelStateBufferFill( uint8_t statebyte ) {
+    // hard clear the pixel buffer
+    for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
+        for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
+            _ledstate[ colour ][ xpos ] = statebyte;
+        }
+    }
+    // all done, return to caller.
+    return;
+}
 
 
 
@@ -269,8 +293,49 @@ uint8_t Pimoroni_5x5_rgb_matrix::pixelGet( uint8_t xpos , uint8_t ypos , uint8_t
 
 
 
+/// @brief Writes the in-memory pixel buffer to an on-chip frame buffer.
+/// @param framenumber The frame number to write to.  0-7.
+void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
+
+    // now lets create a temporary bitmap that defaults to off.
+    uint8_t tempbitmap[18] = { 0 };
+
+    // now loop through and set our pixels.
+    for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
+        for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
+            for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
+
+                // if the bit needs to be set...
+                if ( ( _ledstate[ colour ][ xpos ] & ( 0b1 << ypos ) ) ) {
+                    // set it
+                    tempbitmap[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ] |= ( 0b1 << mappingtable[ colour ][ xpos ][ ypos ][ 1 ] );
+
+                }
+
+            }
+        }
+    }
 
 
+    // now write to chip.
+    _switchFrame( framenumber );
+
+    // say hello to the chip again...
+    wire.beginTransmission( _i2c_address );
+
+    // send the address
+    wire.write( 0x00 );
+
+    for ( uint8_t i = 0 ; i < 18 ; i++ ) {
+        // send the data
+        wire.write( tempbitmap[i] );
+
+    }
+
+    // say goodbye
+    wire.endTransmission();
+
+}
 
 
 

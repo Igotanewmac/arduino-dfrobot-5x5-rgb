@@ -189,11 +189,12 @@ class Pimoroni_5x5_rgb_matrix {
         /// @param statebyte The byte to use for fill.  LSB is leftmost pixel. order XXX43210.
         void pixelStateBufferFill( uint8_t statebyte );
 
-        
 
 
 
-
+        /// @brief Writes the in-memory pixel buffer to an on-chip frame buffer.
+        /// @param framenumber The frame number to write to.  0-7.
+        void frameWrite( uint8_t framenumber );
 
 
 
