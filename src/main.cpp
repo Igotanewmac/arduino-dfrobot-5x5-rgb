@@ -37,6 +37,31 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
 #define BUTTONPIN A0
 
+
+
+
+
+
+
+uint8_t safestepxpos = 0;
+uint8_t safestepypos = 0;
+uint8_t safestepzpos = 0;
+
+void safestep( int8_t xoffset , int8_t yoffset , int8_t zoffset ) {
+  if ( ( xoffset == -1 ) && ( safestepxpos > 0 ) ) { safestepxpos--; }
+  if ( ( xoffset ==  1 ) && ( safestepxpos < 4 ) ) { safestepxpos++; }
+  if ( ( yoffset == -1 ) && ( safestepypos > 0 ) ) { safestepypos--; }
+  if ( ( yoffset ==  1 ) && ( safestepypos < 4 ) ) { safestepypos++; }
+  if ( ( zoffset == -1 ) && ( safestepzpos > 0 ) ) { safestepzpos--; }
+  if ( ( zoffset ==  1 ) && ( safestepzpos < 2 ) ) { safestepzpos++; }
+  return;
+}
+
+
+
+
+
+
 // define the menu options
 int8_t menucurrentchoice = 0;
 
@@ -270,8 +295,108 @@ void menucommand_03() {
   lcd.clear();
   lcd.setCursor( 0 , 0 );
 
+  lcd.print( "Test 3" );
+
+
+  // create the object.
+  Pimoroni_5x5_rgb_matrix myledmatrix( IS31FL3731_I2C_ADDRESS );
+
+  // initialise the chip.
+  myledmatrix.begin( IS31FL3731_I2C_ADDRESS );
+
+  // turn it off
+  myledmatrix.softwareShutdownSet( 1 );
+
+  // switch to static picture mode.
+  myledmatrix.displayModeSet( 0b00 );
+
+  // switch to frame 0
+  myledmatrix.frameDisplayPointerSet( 0 );
+
+    // switch bank to 0
+  wire.beginTransmission( 0x74 );
+  wire.write( 0xFD );
+  wire.write( 0x00 );
+  wire.endTransmission();
+
+  // turn down the pwm
+  for ( int i = 0x24 ; i < 0xB4 ; i++ ) {
+    wire.beginTransmission( 0x74 );
+    wire.write( i );
+    wire.write( 0x0F );
+    wire.endTransmission();
+  }
+
+
+  myledmatrix.pixelStateBufferClear();
+  myledmatrix.frameWrite(0);
+
+
+
+  while (1) {
+    
+    // turn off the old pixel
+    myledmatrix.pixelSet( safestepxpos , safestepypos , safestepzpos , 0 );
+
+    // do the actual move
+    // slow it down to only one direction at a time...
+    switch (random(3))
+    {
+    case 0:
+      safestep( random( -1 , 2 ) , 0 , 0 );
+      break;
+    case 1:
+      safestep( 0 , random( -1 , 2 ) , 0 );
+      break;
+    case 2:
+      safestep( 0 , 0 , random( -1 , 2 ) );
+      break;
+    
+    default:
+      break;
+    }
+
+
+    safestep( random( -1 , 2 ) , random( -1 , 2 ) , random( -1 , 2 ) );
+
+    // now turn on the new pixel
+    myledmatrix.pixelSet( safestepxpos , safestepypos , safestepzpos , 1 );
+
+    // update the screen
+    myledmatrix.frameWrite(0);
+
+    delay( 100 );
+
+
+  }
+  
+  
   
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void menucommand_04() {
 

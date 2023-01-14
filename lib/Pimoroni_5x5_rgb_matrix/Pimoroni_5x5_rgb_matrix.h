@@ -120,6 +120,50 @@ class Pimoroni_5x5_rgb_matrix {
 
 
 
+
+        /// @brief Set a pixels pwm value.
+        /// @param xpos The x position, with 0 at the left.
+        /// @param ypos The y position, with 0 at the top.
+        /// @param colour The colour bank to set. 0 = red, 1 = blue , 2 = green.
+        /// @param state  The pwm value of the pixel. 0x00-0xFF.
+        void pixelpwmSet( uint8_t xpos , uint8_t ypos , uint8_t colour , uint8_t state );
+
+        /// @brief Get a pixels pwm state.
+        /// @param xpos The x position, with 0 on the left.
+        /// @param ypos The y position, with 0 at the top.
+        /// @param colour The colour bank to check. 0 = red, 1 = blue , 2 = green.
+        /// @return The pwm value of the pixel, as a uint8_t. 0-255.
+        uint8_t pixelpwmGet( uint8_t xpos , uint8_t ypos , uint8_t colour );
+        
+
+
+        /// @brief Clear the pixel pwm buffer to all zero.
+        void pixelpwmBufferClear();
+
+        /// @brief Fills the pixel pwm buffer with a given byte.
+        /// @param statebyte The byte to use for fill.  0x00-0xFF.
+        void pixelpwmBufferFill( uint8_t statebyte );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         /// @brief Writes the in-memory pixel buffer to an on-chip frame buffer.
         /// @param framenumber The frame number to write to.  0-7.
         void frameWrite( uint8_t framenumber );
