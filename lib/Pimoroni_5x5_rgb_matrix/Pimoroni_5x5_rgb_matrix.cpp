@@ -148,6 +148,8 @@ void Pimoroni_5x5_rgb_matrix::begin( uint8_t new_i2c_address = 0x75 ) {
     frameDisplayPointerSet( 0x00 );
 
     // clear the buffers
+    pixelStateBufferClear();
+    pixelpwmBufferClear();
     //pixelBufferClearAll();
 
     // now write them out
@@ -400,7 +402,8 @@ void Pimoroni_5x5_rgb_matrix::pixelStateBufferFill( uint8_t statebyte ) {
 /// @param colour The colour bank to set. 0 = red, 1 = blue , 2 = green.
 /// @param state  The pwm value of the pixel. 0x00-0xFF.
 void Pimoroni_5x5_rgb_matrix::pixelpwmSet( uint8_t xpos , uint8_t ypos , uint8_t colour , uint8_t state ) {
-
+    _ledpwmstate[ colour ][ xpos ][ ypos ] = state;
+    return;
 }
 
 /// @brief Get a pixels pwm state.
@@ -409,20 +412,35 @@ void Pimoroni_5x5_rgb_matrix::pixelpwmSet( uint8_t xpos , uint8_t ypos , uint8_t
 /// @param colour The colour bank to check. 0 = red, 1 = blue , 2 = green.
 /// @return The pwm value of the pixel, as a uint8_t. 0-255.
 uint8_t Pimoroni_5x5_rgb_matrix::pixelpwmGet( uint8_t xpos , uint8_t ypos , uint8_t colour ) {
-    return 0;
+    return _ledpwmstate[ colour ][ xpos ][ ypos ];
 }
 
 
 
 /// @brief Clear the pixel pwm buffer to all zero.
 void Pimoroni_5x5_rgb_matrix::pixelpwmBufferClear() {
-
+    for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
+        for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
+            for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
+                _ledpwmstate[ colour ][ xpos ][ ypos ] = 0;
+            }
+        }
+    }
+    return;
 }
+
 
 /// @brief Fills the pixel pwm buffer with a given byte.
 /// @param statebyte The byte to use for fill.  0x00-0xFF.
 void Pimoroni_5x5_rgb_matrix::pixelpwmBufferFill( uint8_t statebyte ) {
-
+    for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
+        for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
+            for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
+                _ledpwmstate[ colour ][ xpos ][ ypos ] = statebyte;
+            }
+        }
+    }
+    return;
 }
 
 
@@ -497,6 +515,40 @@ void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
 
     // say goodbye
     wire.endTransmission();
+
+
+
+
+
+    // write out the pwm structure....
+    for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
+        for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
+            for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
+
+                
+                    // say hello to the chip again...
+                    wire.beginTransmission( _i2c_address );
+
+                    // send the address
+                    wire.write( ( ( ( 0x24 + ( 0x8 * mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ) ) ) + mappingtable[ colour ][ xpos ][ ypos ][ 1 ] ) );
+
+                    // send the data
+                    wire.write( _ledpwmstate[ colour ][ xpos ][ ypos ] );
+
+                    // say goodbye
+                    wire.endTransmission();
+
+
+            }
+        }
+    }
+
+
+
+
+
+
+
 
 }
 
