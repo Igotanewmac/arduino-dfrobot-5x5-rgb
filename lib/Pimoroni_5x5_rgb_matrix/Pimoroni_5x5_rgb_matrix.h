@@ -140,30 +140,12 @@ class Pimoroni_5x5_rgb_matrix {
         uint8_t _ledblinkstate[3][5];
 
         /// @brief The pixel buffer for the pwm values.
-        uint8_t _ledpwmstate[3][5][8];
+        uint8_t _ledpwmstate[3][5][5];
 
 
 
 
-
-
-        /// @brief Optimised write to chip.
-        /// @param framenumber The frame number to write to.
-        void _pixelBufferStateFastWrite( uint8_t framenumber );
-
-
-        /// @brief Optimised write to chip.
-        /// @param framenumber The frame number to write to.
-        void _pixelBufferBlinkStateFastWrite( uint8_t framenumber );
-
-
-        /// @brief Optimised write to chip.
-        /// @param  framenumber The frame number to write to.
-        void _pixelBufferpwmStateFastWrite( uint8_t framenumber );
-
-
-
-
+        
 
 
 
@@ -173,6 +155,10 @@ class Pimoroni_5x5_rgb_matrix {
         Pimoroni_5x5_rgb_matrix( uint8_t new_i2c_address );
         ~Pimoroni_5x5_rgb_matrix();
 
+        /// @brief Set the i2c address and perform any setup required.
+        /// @param new_i2c_address The i2c address of the chip.
+        void begin( uint8_t new_i2c_address );
+
 
 
 
@@ -180,58 +166,20 @@ class Pimoroni_5x5_rgb_matrix {
 
 
 
-        /// @brief Set the i2c address and perform any setup required.
-        /// @param new_i2c_address The i2c address of the chip.
-        void begin( uint8_t new_i2c_address );
+        /// @brief Set a pixels power state to on or off.
+        /// @param xpos The x position, with 0 at the left.
+        /// @param ypos The y position, with 0 at the top.
+        /// @param colour The colour bank to set. 0 = red, 1 = blue , 2 = green.
+        /// @param state  The on-off state of the pixel. 0 = off, 1 = on.
+        void pixelSet( uint8_t xpos , uint8_t ypos , uint8_t colour , uint8_t state );
 
-
-
-        /// @brief Write the pixel buffer to a frame on the chip.
-        /// @param framenumber The number of the frame to write to. 0-7.
-        void pixelBufferWriteAllToFrame( uint8_t framenumber );
-
-
-        /// @brief Write the pixel state buffer to a frame on the chip.
-        /// @param framenubmer The number of the frame to write. 0-7.
-        void pixelBufferStateWriteToFrame( uint8_t framenumber );
-
-        /// @brief Write the pixel blink state buffer to a frame on the chip.
-        /// @param framenumber The number of the frame to write to. 0-7.
-        void pixelBufferBlinkStateWriteToFrame( uint8_t framenumber );
-
-        /// @brief Write the pixel pwm state buffer to a frame on the chip.
-        /// @param framenumber The number of the frame to write to. 0-7.
-        void pixelBufferpwmStateWriteToFrame( uint8_t framenumber );
-
-
-
-
-        /// @brief Sets the pixel buffers for state, blink and pwm to all zero.
-        void pixelBufferClearAll();
-
-
-        /// @brief Sets the pixel buffer for state to all zero.
-        void pixelBufferStateClear();
-
-        /// @brief Sets the pixel buffer for blink state to all zero.
-        void pixelBufferBlinkStateClear();
-
-        /// @brief Sets the pixel buffer for pwm value to all zero.
-        void pixelBufferpwmStateClear();
-
-
-
-        /// @brief Set all pixels state to the given value.
-        /// @param data 0 = off, 1 = on.
-        void pixelBufferStateFill( uint8_t data );
-
-        /// @brief Set all pixels blink state to the given value
-        /// @param data 0 = off, 1 = on.
-        void pixelBufferBlinkStateFill( uint8_t data );
-
-        /// @brief Set all pixels pwm value to the given value.
-        /// @param data 0-255. 0 is fully off, 255 is fully on.
-        void pixelBufferpwmStateFill( uint8_t data );
+        /// @brief Get a pixels power state.
+        /// @param xpos The x position, with 0 on the left.
+        /// @param ypos The y position, with 0 at the top.
+        /// @param colour The colour bank to check. 0 = red, 1 = blue , 2 = green.
+        /// @return The on-off state of the pixel, as a uint8_t. 0 = off, 1 = on.
+        uint8_t pixelGet( uint8_t xpos , uint8_t ypos , uint8_t colour );
+        
 
 
 
@@ -241,49 +189,6 @@ class Pimoroni_5x5_rgb_matrix {
 
 
 
-        /// @brief Sets a pixel to on or off in the pixel buffer.
-        /// @param xpos The x position, with zero at the bottom left.
-        /// @param ypos The y position, with the zero at the bottom left.
-        /// @param state The state, 1 for on, 0 for off.
-        void pixelSet( uint8_t xpos , uint8_t ypos , uint8_t state );
-
-        /// @brief Gets the value of a pixel from the pixel buffer.
-        /// @param xpos The x position, with zero at the bottom left.
-        /// @param ypos The y position, with zero at the bottom left.
-        /// @return The state of the pixel as a uint8_t.  0 for off, 1 for on.
-        uint8_t pixelGet( uint8_t xpos , uint8_t ypos );
-
-
-
-
-
-        /// @brief Set the blink flag for a pixel on or off in the pixel buffer.
-        /// @param xpos The x position, with zero at the bottom left.
-        /// @param ypos The y position, with zero at the bottom left.
-        /// @param state The state of the blink flag as a uint8_t.  0 for off, 1 for on.
-        void pixelBlinkSet( uint8_t xpos , uint8_t ypos , uint8_t state );
-
-        /// @brief Get the state of a pixels blink flag from the pixel buffer.
-        /// @param xpos The x position, with zero at the bottom left.
-        /// @param ypos The y position, with zero at the bottom left.
-        /// @return The state of the pixel as a uint8_t.  0 for off, 1 for on.
-        uint8_t pixelBlinkGet( uint8_t xpos , uint8_t ypos );
-
-
-
-
-
-        /// @brief Set the pwm value for a pixel in the pixel buffer
-        /// @param xpos The x position of the pixel, with zero at the bottom left.
-        /// @param ypos The y position of the pixel, with zero at the bottom left.
-        /// @param state The pwm value to set, as a uint8_t.  0 is full off, 255 is full on.
-        void pixelpwmSet( uint8_t xpos , uint8_t ypos , uint8_t state );
-
-        /// @brief Get the pwm value for a pixel from the pixel buffer.
-        /// @param xpos The x position of the pixel, with zero at the bottom left.
-        /// @param ypos The y position of the pixel, with zero at the bottom left.
-        /// @return The pwm value of the pixel as a uint8_t.  0 is fully off, 255 is fully on.
-        uint8_t pixelpwmGet( uint8_t xpos , uint8_t ypos );
 
 
 
@@ -293,6 +198,21 @@ class Pimoroni_5x5_rgb_matrix {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
         // register config functions
 
         // 0x00 configuration register
