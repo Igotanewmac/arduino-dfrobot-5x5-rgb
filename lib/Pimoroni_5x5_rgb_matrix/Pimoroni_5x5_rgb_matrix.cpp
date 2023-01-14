@@ -221,7 +221,6 @@ void Pimoroni_5x5_rgb_matrix::pixelSet( uint8_t xpos , uint8_t ypos , uint8_t co
         _ledstate[ colour ][ xpos ] &= ~( 0b1 << ypos );
     }
 
-
     // all done, return to caller.
     return;
 

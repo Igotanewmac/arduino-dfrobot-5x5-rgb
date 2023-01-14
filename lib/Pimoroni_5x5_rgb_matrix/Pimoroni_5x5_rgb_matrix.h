@@ -182,37 +182,44 @@ class Pimoroni_5x5_rgb_matrix {
         
 
 
+        /// @brief Clear the pizel state buffer to all zero.
+        void pixelStateBufferClear();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        /// @brief Fills the pixel buffer with a given byte.
+        /// @param statebyte The byte to use for fill.  LSB is leftmost pixel. order XXX43210.
+        void pixelStateBufferFill( uint8_t statebyte );
 
         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         // register config functions
 
         // 0x00 configuration register
