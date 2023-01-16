@@ -482,27 +482,6 @@ void Pimoroni_5x5_rgb_matrix::pixelpwmBufferFill( uint8_t statebyte ) {
 /// @param framenumber The frame number to write to.  0-7.
 void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
 
-    /*
-    // now lets create a temporary bitmap that defaults to off.
-    uint8_t tempbitmap[18] = { 0 };
-
-    // now loop through and set our pixels.
-    for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
-        for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
-            for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
-
-                // if the bit needs to be set...
-                if ( ( _ledstate[ colour ][ xpos ] & ( 0b1 << ypos ) ) ) {
-                    // set it
-                    tempbitmap[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ] |= ( 0b1 << mappingtable[ colour ][ xpos ][ ypos ][ 1 ] );
-
-                }
-
-            }
-        }
-    }
-    */
-
     // now write to chip.
     _switchFrame( framenumber );
 
@@ -524,38 +503,30 @@ void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
 
 
 
-    /*
-    // write out the pwm structure....
-    for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
-        for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
-            for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
-
-                
-                    // say hello to the chip again...
-                    wire.beginTransmission( _i2c_address );
-
-                    // send the address
-                    wire.write( ( ( ( 0x24 + ( 0x8 * mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ) ) ) + mappingtable[ colour ][ xpos ][ ypos ][ 1 ] ) );
-
-                    // send the data
-                    wire.write( _ledpwmstate[ colour ][ xpos ][ ypos ] );
-
-                    // say goodbye
-                    wire.endTransmission();
 
 
-            }
+    // write out the pwm values.
+    // need to break it up into rows as the chip cant handle a full teble dump.
+    // for each row...
+    for ( uint8_t xpos = 0 ; xpos < 18 ; xpos++ ) {
+        // say hello to the chip.
+        wire.beginTransmission( _i2c_address );
+        // send the row address.
+        wire.write( ( 0x24 + ( xpos * 8 ) ) );
+        // for each byte in the row.
+        for ( uint8_t ypos = 0 ; ypos < 8 ; ypos++ ) {
+            // send the byte.
+            wire.write( _ledpwmstate[ xpos ][ ypos ] );
         }
+        // say goodbye to the chip.
+        wire.endTransmission();
+    // all done for this row, loop around again for the next row.
     }
-    */
+    
 
 
-
-
-
-
-
-
+    // all done, return to caller.
+    return;
 
 }
 

@@ -107,15 +107,38 @@ class Pimoroni_5x5_rgb_matrix {
         /// @param colour The colour bank to check. 0 = red, 1 = blue , 2 = green.
         /// @return The on-off state of the pixel, as a uint8_t. 0 = off, 1 = on.
         uint8_t pixelGet( uint8_t xpos , uint8_t ypos , uint8_t colour );
-        
 
-
-        /// @brief Clear the pizel state buffer to all zero.
+        /// @brief Clear the pixel state buffer to all zero.
         void pixelStateBufferClear();
 
         /// @brief Fills the pixel buffer with a given byte.
         /// @param statebyte The byte to use for fill.  LSB is leftmost pixel. order XXX43210.
         void pixelStateBufferFill( uint8_t statebyte );
+
+
+
+
+
+        /// @brief Set a pixels blink state to on or off.
+        /// @param xpos The x position, with 0 at the left.
+        /// @param ypos The y position, with 0 at the top.
+        /// @param colour The colour bank to set. 0 = red, 1 = blue , 2 = green.
+        /// @param state  The on-off blink state of the pixel. 0 = off, 1 = on.
+        void pixelBlinkSet( uint8_t xpos , uint8_t ypos , uint8_t colour , uint8_t state );
+
+        /// @brief Get a pixels blink state.
+        /// @param xpos The x position, with 0 on the left.
+        /// @param ypos The y position, with 0 at the top.
+        /// @param colour The colour bank to check. 0 = red, 1 = blue , 2 = green.
+        /// @return The on-off blink state of the pixel, as a uint8_t. 0 = off, 1 = on.
+        uint8_t pixelBlinkGet( uint8_t xpos , uint8_t ypos , uint8_t colour );
+
+        /// @brief Clear the pixel blink state buffer to all zero.
+        void pixelBlinkStateBufferClear();
+
+        /// @brief Fills the pixel blink state buffer with a given byte.
+        /// @param statebyte The byte to use for fill.  LSB is leftmost pixel. order XXX43210.
+        void pixelBlinkStateBufferFill( uint8_t statebyte );
 
 
 

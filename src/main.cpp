@@ -196,7 +196,7 @@ void menucommand_01() {
           myledmatrix.pixelStateBufferClear();
           myledmatrix.pixelSet( xpos , ypos , colour , 1 );
           myledmatrix.frameWrite( 0 );
-          delay( 100 );
+          //delay( 100 );
         }
       }
     }
