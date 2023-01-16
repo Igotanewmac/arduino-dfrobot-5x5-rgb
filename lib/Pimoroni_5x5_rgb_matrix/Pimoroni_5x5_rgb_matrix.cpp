@@ -149,7 +149,7 @@ void Pimoroni_5x5_rgb_matrix::begin( uint8_t new_i2c_address = 0x75 ) {
 
     // clear the buffers
     pixelStateBufferClear();
-    pixelpwmBufferClear();
+    pixelpwmStateBufferClear();
     //pixelBufferClearAll();
 
     // now write them out
@@ -357,7 +357,7 @@ uint8_t Pimoroni_5x5_rgb_matrix::pixelGet( uint8_t xpos , uint8_t ypos , uint8_t
 
 
 
-/// @brief Clear the pizel state buffer to all zero.
+/// @brief Clear the pixel state buffer to all zero.
 void Pimoroni_5x5_rgb_matrix::pixelStateBufferClear() {
     // hard clear the pixel buffer
     for ( uint8_t i = 0 ; i < 18 ; i++ ) {
@@ -393,6 +393,79 @@ void Pimoroni_5x5_rgb_matrix::pixelStateBufferFill( uint8_t statebyte ) {
 
 
 
+/// @brief Set a pixels blink state to on or off.
+/// @param xpos The x position, with 0 at the left.
+/// @param ypos The y position, with 0 at the top.
+/// @param colour The colour bank to set. 0 = red, 1 = blue , 2 = green.
+/// @param state  The on-off blink state of the pixel. 0 = off, 1 = on.
+void Pimoroni_5x5_rgb_matrix::pixelBlinkSet( uint8_t xpos , uint8_t ypos , uint8_t colour , uint8_t state ) {
+    // set the pixel blink state
+    if ( state ) {
+        // if we are turning on...
+        _ledblinkstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ] |= ( 0b1 << mappingtable[ colour ][ xpos ][ ypos][ 1 ] );
+    }
+    else {
+        // if we are turning off...
+        _ledblinkstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ] &= ~( 0b1 << mappingtable[ colour ][ xpos ][ ypos][ 1 ] );
+    }
+
+    // all done, return to caller.
+    return;
+}
+
+/// @brief Get a pixels blink state.
+/// @param xpos The x position, with 0 on the left.
+/// @param ypos The y position, with 0 at the top.
+/// @param colour The colour bank to check. 0 = red, 1 = blue , 2 = green.
+/// @return The on-off blink state of the pixel, as a uint8_t. 0 = off, 1 = on.
+uint8_t Pimoroni_5x5_rgb_matrix::pixelBlinkGet( uint8_t xpos , uint8_t ypos , uint8_t colour ) {
+
+    // just return the right bit.
+    return ( ( _ledblinkstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ] & ( 0b1 << mappingtable[ colour ][ xpos ][ ypos][ 1 ] ) ) >> mappingtable[ colour ][ xpos ][ ypos][ 1 ] );
+
+}
+
+/// @brief Clear the pixel blink state buffer to all zero.
+void Pimoroni_5x5_rgb_matrix::pixelBlinkStateBufferClear() {
+    // hard clear the pixel buffer
+    for ( uint8_t i = 0 ; i < 18 ; i++ ) {
+        _ledblinkstate[ i ] = 0x00;
+    }
+
+    // all done, return to caller.
+    return;
+}
+
+/// @brief Fills the pixel blink state buffer with a given byte.
+/// @param statebyte The byte to use for fill.  LSB is leftmost pixel. order XXX43210.
+void Pimoroni_5x5_rgb_matrix::pixelBlinkStateBufferFill( uint8_t statebyte ) {
+    // hard clear the pixel buffer
+
+    // this is the big slow loop part!
+    for ( uint8_t colour = 0; colour < 3 ; colour++ ) {
+        for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
+            for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
+                pixelBlinkSet( xpos , ypos , colour , ( ( statebyte & ( 0b1 << ypos ) ) >> ypos ) );
+            }
+        }
+    }
+
+    // all done, return to caller.
+    return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -405,7 +478,7 @@ void Pimoroni_5x5_rgb_matrix::pixelStateBufferFill( uint8_t statebyte ) {
 /// @param ypos The y position, with 0 at the top.
 /// @param colour The colour bank to set. 0 = red, 1 = blue , 2 = green.
 /// @param state  The pwm value of the pixel. 0x00-0xFF.
-void Pimoroni_5x5_rgb_matrix::pixelpwmSet( uint8_t xpos , uint8_t ypos , uint8_t colour , uint8_t state ) {
+void Pimoroni_5x5_rgb_matrix::pixelpwmStateSet( uint8_t xpos , uint8_t ypos , uint8_t colour , uint8_t state ) {
     _ledpwmstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ][ mappingtable[ colour ][ xpos ][ ypos ][ 1 ] ] = state;
     return;
 }
@@ -415,14 +488,14 @@ void Pimoroni_5x5_rgb_matrix::pixelpwmSet( uint8_t xpos , uint8_t ypos , uint8_t
 /// @param ypos The y position, with 0 at the top.
 /// @param colour The colour bank to check. 0 = red, 1 = blue , 2 = green.
 /// @return The pwm value of the pixel, as a uint8_t. 0-255.
-uint8_t Pimoroni_5x5_rgb_matrix::pixelpwmGet( uint8_t xpos , uint8_t ypos , uint8_t colour ) {
+uint8_t Pimoroni_5x5_rgb_matrix::pixelpwmStateGet( uint8_t xpos , uint8_t ypos , uint8_t colour ) {
     return _ledpwmstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ][ mappingtable[ colour ][ xpos ][ ypos ][ 1 ] ];
 }
 
 
 
 /// @brief Clear the pixel pwm buffer to all zero.
-void Pimoroni_5x5_rgb_matrix::pixelpwmBufferClear() {
+void Pimoroni_5x5_rgb_matrix::pixelpwmStateBufferClear() {
     for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
         for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
             for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
@@ -436,7 +509,7 @@ void Pimoroni_5x5_rgb_matrix::pixelpwmBufferClear() {
 
 /// @brief Fills the pixel pwm buffer with a given byte.
 /// @param statebyte The byte to use for fill.  0x00-0xFF.
-void Pimoroni_5x5_rgb_matrix::pixelpwmBufferFill( uint8_t statebyte ) {
+void Pimoroni_5x5_rgb_matrix::pixelpwmStateBufferFill( uint8_t statebyte ) {
     for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
         for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
             for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
@@ -494,6 +567,26 @@ void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
     for ( uint8_t i = 0 ; i < 18 ; i++ ) {
         // send the data
         wire.write( _ledstate[ i ] );
+
+    }
+
+    // say goodbye
+    wire.endTransmission();
+
+
+
+
+    // write out the blink values....
+
+    // say hello to the chip again...
+    wire.beginTransmission( _i2c_address );
+
+    // send the address
+    wire.write( 0x12 );
+
+    for ( uint8_t i = 0 ; i < 18 ; i++ ) {
+        // send the data
+        wire.write( _ledblinkstate[ i ] );
 
     }
 

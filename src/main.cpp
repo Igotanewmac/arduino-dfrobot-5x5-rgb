@@ -72,7 +72,7 @@ String menutext[6] = { "I2C Scan" ,
                        "Test 2" ,
                        "Test 3" ,
                        "Test 4" ,
-                       ""
+                       "Test 5"
                        };
 
 
@@ -185,7 +185,7 @@ void menucommand_01() {
 
   // try out some pixel commands
   
-  myledmatrix.pixelpwmBufferFill( 0x40 );
+  myledmatrix.pixelpwmStateBufferFill( 0x40 );
 
 
 
@@ -256,14 +256,14 @@ void menucommand_02() {
     wire.endTransmission();
   }
   */
-  myledmatrix.pixelpwmBufferFill( 0x0F );
+  myledmatrix.pixelpwmStateBufferFill( 0x0F );
 
 
   while (1) {
 
     for ( int i = 0 ; i < 0b100000 ; i++ ) {
       myledmatrix.pixelStateBufferFill( i );
-      myledmatrix.pixelpwmBufferFill( i + 1 );
+      myledmatrix.pixelpwmStateBufferFill( i + 1 );
       myledmatrix.frameWrite( 0 );
       delay( 1000 );
     }
@@ -332,6 +332,7 @@ void menucommand_03() {
 
 
   myledmatrix.pixelStateBufferClear();
+  myledmatrix.pixelpwmStateBufferFill( 0x04 );
   myledmatrix.frameWrite(0);
 
 
@@ -360,7 +361,7 @@ void menucommand_03() {
     }
 
 
-    safestep( random( -1 , 2 ) , random( -1 , 2 ) , random( -1 , 2 ) );
+    //safestep( random( -1 , 2 ) , random( -1 , 2 ) , random( -1 , 2 ) );
 
     // now turn on the new pixel
     myledmatrix.pixelSet( safestepxpos , safestepypos , safestepzpos , 1 );
@@ -433,7 +434,7 @@ void menucommand_04() {
 
 
   myledmatrix.pixelStateBufferFill( 0xFF );
-  myledmatrix.pixelpwmBufferClear();
+  myledmatrix.pixelpwmStateBufferClear();
 
 
   while (1) {
@@ -445,7 +446,7 @@ void menucommand_04() {
       
       counter++;
 
-      myledmatrix.pixelpwmBufferFill( counter );
+      myledmatrix.pixelpwmStateBufferFill( counter );
       myledmatrix.frameWrite( 0 );
       //delay( 256 - counter );
 
@@ -457,7 +458,7 @@ void menucommand_04() {
 
       
       counter--;
-      myledmatrix.pixelpwmBufferFill( counter );
+      myledmatrix.pixelpwmStateBufferFill( counter );
       myledmatrix.frameWrite(0);
 
       //delay( 256 - counter );
@@ -481,7 +482,50 @@ void menucommand_04() {
 
 
 
-void menucommand_05() {};
+void menucommand_05() {
+
+
+// bring up the wire library as a master
+  wire.begin();
+
+  // move cursor to home
+  lcd.clear();
+  lcd.setCursor( 0 , 0 );
+
+  lcd.print( "Test 5 - Active" );
+
+
+  // create the object.
+  Pimoroni_5x5_rgb_matrix myledmatrix( IS31FL3731_I2C_ADDRESS );
+
+  // initialise the chip.
+  myledmatrix.begin( IS31FL3731_I2C_ADDRESS );
+
+  // turn it off
+  myledmatrix.softwareShutdownSet( 1 );
+
+  // switch to static picture mode.
+  myledmatrix.displayModeSet( 0b00 );
+
+  // switch to frame 0
+  myledmatrix.frameDisplayPointerSet( 0 );
+
+  myledmatrix.blinkEnableSet( 1 );
+  myledmatrix.blinkPeriodTimeSet( 3 );
+
+  myledmatrix.pixelStateBufferFill( 0xFF );
+  myledmatrix.pixelpwmStateBufferFill( 0x04 );
+  myledmatrix.pixelBlinkStateBufferFill( 0b10101 );
+  //myledmatrix.pixelBlinkStateBufferClear();
+  myledmatrix.frameWrite(0);
+
+  while (1) {
+
+
+  }
+
+
+};
 
 
 
