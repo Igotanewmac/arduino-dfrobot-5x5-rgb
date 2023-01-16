@@ -192,6 +192,11 @@ class Pimoroni_5x5_rgb_matrix {
         void frameWrite( uint8_t framenumber );
 
 
+        /// @brief Writes the in-memory pixel state buffer to an on-chip frame buffer.
+        /// @param framenumber The frame number to write to.  0-7.
+        void frameWritePixelState( uint8_t framenumber );
+
+
 
 
 

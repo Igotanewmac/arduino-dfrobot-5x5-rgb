@@ -638,6 +638,40 @@ void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
 
 
 
+/// @brief Writes the in-memory pixel buffer to an on-chip frame buffer.
+/// @param framenumber The frame number to write to.  0-7.
+void Pimoroni_5x5_rgb_matrix::frameWritePixelState( uint8_t framenumber ) {
+
+    // now write to chip.
+    _switchFrame( framenumber );
+
+    // say hello to the chip again...
+    wire.beginTransmission( _i2c_address );
+
+    // send the address
+    wire.write( 0x00 );
+
+    for ( uint8_t i = 0 ; i < 18 ; i++ ) {
+        // send the data
+        wire.write( _ledstate[ i ] );
+
+    }
+
+    // say goodbye
+    wire.endTransmission();
+
+
+
+
+
+
+    // all done, return to caller.
+    return;
+
+}
+
+
+
 
 
 
