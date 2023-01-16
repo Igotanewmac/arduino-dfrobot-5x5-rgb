@@ -315,11 +315,11 @@ void Pimoroni_5x5_rgb_matrix::pixelSet( uint8_t xpos , uint8_t ypos , uint8_t co
     // set the pixel state
     if ( state ) {
         // if we are turning on...
-        _ledstate[ colour ][ xpos ] |= ( 0b1 << ypos );
+        _ledstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ] |= ( 0b1 << mappingtable[ colour ][ xpos ][ ypos][ 1 ] );
     }
     else {
         // if we are turning off...
-        _ledstate[ colour ][ xpos ] &= ~( 0b1 << ypos );
+        _ledstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ] &= ~( 0b1 << mappingtable[ colour ][ xpos ][ ypos][ 1 ] );
     }
 
     // all done, return to caller.
@@ -341,7 +341,7 @@ void Pimoroni_5x5_rgb_matrix::pixelSet( uint8_t xpos , uint8_t ypos , uint8_t co
 uint8_t Pimoroni_5x5_rgb_matrix::pixelGet( uint8_t xpos , uint8_t ypos , uint8_t colour ) {
 
     // just return the right bit.
-    return ( ( _ledstate[ colour ][ xpos ] & ( 0b1 << ypos ) ) >> ypos );
+    return ( ( _ledstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ] & ( 0b1 << mappingtable[ colour ][ xpos ][ ypos][ 1 ] ) ) >> mappingtable[ colour ][ xpos ][ ypos][ 1 ] );
 
 }
 
@@ -360,11 +360,10 @@ uint8_t Pimoroni_5x5_rgb_matrix::pixelGet( uint8_t xpos , uint8_t ypos , uint8_t
 /// @brief Clear the pizel state buffer to all zero.
 void Pimoroni_5x5_rgb_matrix::pixelStateBufferClear() {
     // hard clear the pixel buffer
-    for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
-        for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
-            _ledstate[ colour ][ xpos ] = 0;
-        }
+    for ( uint8_t i = 0 ; i < 18 ; i++ ) {
+        _ledstate[ i ] = 0;
     }
+
     // all done, return to caller.
     return;
 }
@@ -373,11 +372,16 @@ void Pimoroni_5x5_rgb_matrix::pixelStateBufferClear() {
 /// @param statebyte The byte to use for fill.  LSB is leftmost pixel. order XXX43210.
 void Pimoroni_5x5_rgb_matrix::pixelStateBufferFill( uint8_t statebyte ) {
     // hard clear the pixel buffer
-    for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
+
+    // this is the big slow loop part!
+    for ( uint8_t colour = 0; colour < 3 ; colour++ ) {
         for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
-            _ledstate[ colour ][ xpos ] = statebyte;
+            for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
+                pixelSet( xpos , ypos , colour , ( ( statebyte & ( 0b1 << ypos ) ) >> ypos ) );
+            }
         }
     }
+
     // all done, return to caller.
     return;
 }
@@ -402,7 +406,7 @@ void Pimoroni_5x5_rgb_matrix::pixelStateBufferFill( uint8_t statebyte ) {
 /// @param colour The colour bank to set. 0 = red, 1 = blue , 2 = green.
 /// @param state  The pwm value of the pixel. 0x00-0xFF.
 void Pimoroni_5x5_rgb_matrix::pixelpwmSet( uint8_t xpos , uint8_t ypos , uint8_t colour , uint8_t state ) {
-    _ledpwmstate[ colour ][ xpos ][ ypos ] = state;
+    _ledpwmstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ][ mappingtable[ colour ][ xpos ][ ypos ][ 1 ] ] = state;
     return;
 }
 
@@ -412,7 +416,7 @@ void Pimoroni_5x5_rgb_matrix::pixelpwmSet( uint8_t xpos , uint8_t ypos , uint8_t
 /// @param colour The colour bank to check. 0 = red, 1 = blue , 2 = green.
 /// @return The pwm value of the pixel, as a uint8_t. 0-255.
 uint8_t Pimoroni_5x5_rgb_matrix::pixelpwmGet( uint8_t xpos , uint8_t ypos , uint8_t colour ) {
-    return _ledpwmstate[ colour ][ xpos ][ ypos ];
+    return _ledpwmstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ][ mappingtable[ colour ][ xpos ][ ypos ][ 1 ] ];
 }
 
 
@@ -422,7 +426,7 @@ void Pimoroni_5x5_rgb_matrix::pixelpwmBufferClear() {
     for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
         for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
             for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
-                _ledpwmstate[ colour ][ xpos ][ ypos ] = 0;
+                _ledpwmstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ][ mappingtable[ colour ][ xpos ][ ypos ][ 1 ] ] = 0;
             }
         }
     }
@@ -436,7 +440,7 @@ void Pimoroni_5x5_rgb_matrix::pixelpwmBufferFill( uint8_t statebyte ) {
     for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
         for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
             for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
-                _ledpwmstate[ colour ][ xpos ][ ypos ] = statebyte;
+                _ledpwmstate[ mappingtable[ colour ][ xpos ][ ypos ][ 0 ] ][ mappingtable[ colour ][ xpos ][ ypos ][ 1 ] ] = statebyte;
             }
         }
     }
@@ -478,6 +482,7 @@ void Pimoroni_5x5_rgb_matrix::pixelpwmBufferFill( uint8_t statebyte ) {
 /// @param framenumber The frame number to write to.  0-7.
 void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
 
+    /*
     // now lets create a temporary bitmap that defaults to off.
     uint8_t tempbitmap[18] = { 0 };
 
@@ -496,7 +501,7 @@ void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
             }
         }
     }
-
+    */
 
     // now write to chip.
     _switchFrame( framenumber );
@@ -509,7 +514,7 @@ void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
 
     for ( uint8_t i = 0 ; i < 18 ; i++ ) {
         // send the data
-        wire.write( tempbitmap[i] );
+        wire.write( _ledstate[ i ] );
 
     }
 
@@ -519,7 +524,7 @@ void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
 
 
 
-
+    /*
     // write out the pwm structure....
     for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
         for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
@@ -542,6 +547,8 @@ void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
             }
         }
     }
+    */
+
 
 
 

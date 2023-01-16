@@ -62,13 +62,13 @@ class Pimoroni_5x5_rgb_matrix {
 
 
         /// @brief The pixel buffer for the on/pff state.
-        uint8_t _ledstate[3][5];
+        uint8_t _ledstate[ 18 ] = { 0 };
 
         /// @brief The pixel buffer for the blink on/off state.
-        uint8_t _ledblinkstate[3][5];
+        uint8_t _ledblinkstate[ 18 ] = { 0 };
 
         /// @brief The pixel buffer for the pwm values.
-        uint8_t _ledpwmstate[3][5][5];
+        uint8_t _ledpwmstate[ 18 ][ 8 ] = { 0 };
 
 
 
