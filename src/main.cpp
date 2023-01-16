@@ -65,14 +65,15 @@ void safestep( int8_t xoffset , int8_t yoffset , int8_t zoffset ) {
 // define the menu options
 int8_t menucurrentchoice = 0;
 
-uint8_t menumaxchoices = 6;
+uint8_t menumaxchoices = 7;
 
-String menutext[6] = { "I2C Scan" ,
+String menutext[7] = { "I2C Scan" ,
                        "Test 1" ,
                        "Test 2" ,
                        "Test 3" ,
                        "Test 4" ,
-                       "Test 5"
+                       "Test 5" ,
+                       "Test 6"
                        };
 
 
@@ -511,7 +512,7 @@ void menucommand_05() {
   myledmatrix.frameDisplayPointerSet( 0 );
 
   myledmatrix.blinkEnableSet( 1 );
-  myledmatrix.blinkPeriodTimeSet( 3 );
+  myledmatrix.blinkPeriodTimeSet( 1 );
 
   myledmatrix.pixelStateBufferFill( 0xFF );
   myledmatrix.pixelpwmStateBufferFill( 0x04 );
@@ -531,6 +532,89 @@ void menucommand_05() {
 
 
 
+
+
+
+void menucommand_06() {
+
+
+// bring up the wire library as a master
+  wire.begin();
+
+  // move cursor to home
+  lcd.clear();
+  lcd.setCursor( 0 , 0 );
+
+  lcd.print( "Test 6 - Active" );
+
+  lcd.setCursor( 0 , 1 );
+  lcd.print( "Twinkles!" );
+
+
+  // create the object.
+  Pimoroni_5x5_rgb_matrix myledmatrix( IS31FL3731_I2C_ADDRESS );
+
+  // initialise the chip.
+  myledmatrix.begin( IS31FL3731_I2C_ADDRESS );
+
+  // turn it off
+  myledmatrix.softwareShutdownSet( 1 );
+
+  // switch to static picture mode.
+  myledmatrix.displayModeSet( 0b00 );
+
+  // switch to frame 0
+  myledmatrix.frameDisplayPointerSet( 0 );
+
+  //myledmatrix.blinkEnableSet( 1 );
+  //myledmatrix.blinkPeriodTimeSet( 1 );
+
+  myledmatrix.pixelStateBufferFill( 0xFF );
+  myledmatrix.pixelpwmStateBufferFill( 0x00 );
+  myledmatrix.pixelBlinkStateBufferClear();
+  //myledmatrix.pixelBlinkStateBufferClear();
+  myledmatrix.frameWrite(0);
+    
+
+  while (1) {
+
+    uint8_t xpos = random( 0 , 5 );
+    uint8_t ypos = random( 0 , 5 );
+
+    // get our red pwm value
+    uint8_t pwmvalue = myledmatrix.pixelpwmStateGet( xpos , ypos , 0 );
+
+    // change it a little
+    int8_t randomvalue = random( -1 , 2 );
+
+    switch (randomvalue)
+    {
+    case -1:
+      if ( pwmvalue > 0 ) { pwmvalue--; }
+      break;
+    case  0:
+      break;
+    case  1:
+      if ( pwmvalue < 0x10 ) { pwmvalue++; }
+      break;
+    
+    default:
+      break;
+    }
+    
+    // now write it back...
+    myledmatrix.pixelpwmStateSet( xpos , ypos , 0 , pwmvalue );
+    myledmatrix.pixelpwmStateSet( xpos , ypos , 1 , pwmvalue );
+    myledmatrix.pixelpwmStateSet( xpos , ypos , 2 , pwmvalue );
+
+    // now update the frame
+    myledmatrix.frameWrite( 0 );
+
+
+  }
+
+
+};
 
 
 
@@ -581,6 +665,9 @@ void domenuaction() {
     break;
   case 5:
     menucommand_05();
+    break;
+  case 6:
+    menucommand_06();
     break;
   
   default:
