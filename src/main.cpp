@@ -137,57 +137,12 @@ void menucommand_01() {
   // switch to frame 0
   myledmatrix.frameDisplayPointerSet( 0 );
 
-  /*
-  // switch bank to 0
-  wire.beginTransmission( 0x74 );
-  wire.write( 0xFD );
-  wire.write( 0x00 );
-  wire.endTransmission();
-
   
-  wire.beginTransmission( 0x74 );
-  wire.write( 0x00 );
-  wire.write( 0b00000000 ); //  1 none
-  wire.write( 0b00000000 ); //  2 done
-  wire.write( 0b00000000 ); //  3 done
-  wire.write( 0b00000000 ); //  4 done
-  wire.write( 0b00000000 ); //  5 done
-  wire.write( 0b00000000 ); //  6 done
-  wire.write( 0b00000000 ); //  7 done
-  wire.write( 0b00000000 ); //  8 done
-  wire.write( 0b00000000 ); //  9 done
-  wire.write( 0b00000000 ); // 10 none
-  wire.write( 0b00000000 ); // 11 done
-  wire.write( 0b00000000 ); // 12 done
-  wire.write( 0b00000000 ); // 13 done
-  wire.write( 0b00000000 ); // 14 done
-  wire.write( 0b00000000 ); // 15 done
-  wire.write( 0b00000000 ); // 16 done
-  wire.write( 0b00000000 ); // 17 done
-  wire.write( 0b00000000 ); // 18 none
-  wire.endTransmission();
-  */
-
-  // switch bank to 0
-  wire.beginTransmission( 0x74 );
-  wire.write( 0xFD );
-  wire.write( 0x00 );
-  wire.endTransmission();
-
-  // turn down the pwm
-  for ( int i = 0x24 ; i < 0xB4 ; i++ ) {
-    wire.beginTransmission( 0x74 );
-    wire.write( i );
-    wire.write( 0x80 );
-    wire.endTransmission();
-  }
-  
-
 
   // try out some pixel commands
   
   myledmatrix.pixelpwmStateBufferFill( 0x40 );
-
+  myledmatrix.frameWrite( 0 );
 
 
   while (1) {
@@ -520,11 +475,7 @@ void menucommand_05() {
   //myledmatrix.pixelBlinkStateBufferClear();
   myledmatrix.frameWrite(0);
 
-  while (1) {
-
-
-  }
-
+  while (1);
 
 };
 
@@ -615,6 +566,19 @@ void menucommand_06() {
 
 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
