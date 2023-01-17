@@ -36,6 +36,14 @@
 #define IS31FL3731_ADDRESS_AGC_CONTROL_REG 0x0B
 #define IS31FL3731_ADDRESS_AUDIO_ADC_RATE_REG 0x0C
 
+// frame buffer addresses
+#define IS31FL3731_ADDRESS_FRAME_BUFFER_STATE 0x00
+#define IS31FL3731_ADDRESS_FRAME_BUFFER_BLINK 0x00
+#define IS31FL3731_ADDRESS_FRAME_BUFFER_PWM 0x00
+
+
+
+
 
 
 
@@ -73,8 +81,10 @@ class IS31FL3731 {
 
     public:
 
-        IS31FL3731(/* args */);
+        /// @brief Constructor.  Doesn't do anything but create the object.
+        IS31FL3731();
 
+        /// @brief Destructor.  Doesn't actually do anything, included fir future expansion if needed.
         ~IS31FL3731();
 
 
@@ -87,10 +97,23 @@ class IS31FL3731 {
         // just take a pointer to the right sized array and blit it to the right frame.
         // let the parent handle the mapping and pixel buffering.
 
+        
+        /// @brief Write the pixel state to the chip.
+        /// @param framenumber The number of the frame to write to. 0-7.
+        /// @param framedata The frame data as an array of 18 uint8_t's.
+        void frameWriteState( uint8_t framenumber , uint8_t *framedata );
 
+        /// @brief Write the pixel blink state to the chip.
+        /// @param framenumber The number of the frame to write to. 0-7.
+        /// @param framedata The frame data as an array of 18 uint8_t's.
+        void frameWriteBlink( uint8_t framenumber , uint8_t *framedata );
 
+        /// @brief Write the pixel pwm state to the chip.
+        /// @param framenumber The number of the frame to write to. 0-7.
+        /// @param framedata The frame data as an array of 18*8 uint8_t's.
+        void frameWritepwm( uint8_t framenumber , uint8_t *framedata );
 
-
+        
 
 
 

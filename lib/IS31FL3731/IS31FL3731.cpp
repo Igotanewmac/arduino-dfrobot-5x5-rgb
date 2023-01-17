@@ -159,6 +159,141 @@ void IS31FL3731::begin( uint8_t i2c_address ) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+/// @brief Write the pixel state to the chip.
+/// @param framenumber The number of the frame to write to. 0-7.
+/// @param framedata The frame data as an array of 18 uint8_t's.
+void IS31FL3731::frameWriteState( uint8_t framenumber , uint8_t *framedata ) {
+
+    // switch to the right frame
+    _switchFrame( framenumber );
+
+    // now send the data
+    wire.beginTransmission( _i2c_address );
+    wire.write( IS31FL3731_ADDRESS_FRAME_BUFFER_STATE );
+    for ( uint8_t i = 0 ; i < 18 ; i++ ) {
+        wire.write( framedata[i] );
+    }
+    wire.endTransmission();
+
+    // all done, return to caller.
+    return;
+
+}
+
+
+
+
+
+
+/// @brief Write the pixel blink state to the chip.
+/// @param framenumber The number of the frame to write to. 0-7.
+/// @param framedata The frame data as an array of 18 uint8_t's.
+void IS31FL3731::frameWriteBlink( uint8_t framenumber , uint8_t *framedata ) {
+
+    // switch to the right frame
+    _switchFrame( framenumber );
+
+    // now send the data
+    wire.beginTransmission( _i2c_address );
+    wire.write( IS31FL3731_ADDRESS_FRAME_BUFFER_BLINK );
+    for ( uint8_t i = 0 ; i < 18 ; i++ ) {
+        wire.write( framedata[i] );
+    }
+    wire.endTransmission();
+
+    // all done, return to caller.
+    return;
+
+}
+
+
+
+
+
+
+
+
+
+
+/// @brief Write the pixel pwm state to the chip.
+/// @param framenumber The number of the frame to write to. 0-7.
+/// @param framedata The frame data as an array of 18*8 uint8_t's.
+void IS31FL3731::frameWritepwm( uint8_t framenumber , uint8_t *framedata ) {
+
+    // switch to the right frame
+    _switchFrame( framenumber );
+
+    // for each row...
+    for ( uint8_t row = 0 ; row < 18 ; row++ ) {
+
+        // say hello to the chip
+        wire.beginTransmission( _i2c_address );
+
+        // send the address
+        wire.write( IS31FL3731_ADDRESS_FRAME_BUFFER_PWM + ( 8 * row ) );
+
+        // send the row data
+        for ( uint8_t column = 0 ; column < 8 ; column++ ) {
+            wire.write( framedata[ ( 8 * row ) + column ] );
+        }
+
+        // now say goodbye to the chip.
+        wire.endTransmission();
+        
+        // now go around again for the next row...
+    }
+
+    // all done, return to caller.
+    return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // register config functions
 
 // 0x00 configuration register
