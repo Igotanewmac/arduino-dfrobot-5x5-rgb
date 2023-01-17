@@ -148,8 +148,8 @@ void Pimoroni_5x5_rgb_matrix::begin( uint8_t new_i2c_address = 0x75 ) {
     frameDisplayPointerSet( 0x00 );
 
     // clear the buffers
-    pixelStateBufferClear();
-    pixelpwmStateBufferClear();
+    //pixelStateBufferClear();
+    //pixelpwmStateBufferClear();
     //pixelBufferClearAll();
 
     // now write them out
