@@ -23,24 +23,7 @@ class  Pimoroni_5x5_rgb_matrix : public IS31FL3731 {
 
         uint8_t _i2c_address = 0x74;
 
-        /// @brief The last frame number we switched to.  0-7, 0b for control page.
-        uint8_t _currentframe;
 
-        /// @brief Switch to a different frame, if necessary.
-        /// @param framenumber The frame number to switch to.
-        void _switchFrame( uint8_t framenumber );
-
-        /// @brief Write a single byte of data to the chip.
-        /// @param framenumber The number of the frame to write to. 0x00-0x07 Animation. 0x0B Control.
-        /// @param address The address within the frame to write to.
-        /// @param data The data byte to write to the chip.
-        void _chipwritebyte( uint8_t framenumber , uint8_t address , uint8_t data );
-
-        /// @brief Read a single byte of data from the chip.
-        /// @param framenumber The number of the frame to read from. 0x00-0x07 Animation. 0x0B Control.
-        /// @param address The address within the frame to read from.
-        /// @return The data byte rturned from the chip as a uint8_t.
-        uint8_t _chipreadbyte( uint8_t framenumber , uint8_t address );
     
 
 

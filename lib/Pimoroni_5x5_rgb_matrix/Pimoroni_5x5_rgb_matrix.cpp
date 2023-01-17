@@ -6,7 +6,7 @@
 
 #include <Pimoroni_5x5_rgb_matrix.h>
 
-
+#include <IS31FL3731.h>
 
 
 
@@ -181,89 +181,6 @@ void Pimoroni_5x5_rgb_matrix::begin( uint8_t new_i2c_address = 0x75 ) {
 
 
 
-
-/// @brief Switch to a different frame, if necessary.
-/// @param framenumber The frame number to switch to.
-void Pimoroni_5x5_rgb_matrix::_switchFrame( uint8_t framenumber ) {
-
-    // check if we need to switch at all?
-    if ( framenumber == _currentframe ) { return; }
-
-    // ok, we need to switch now, perform an i2c transaction.
-    wire.beginTransmission( _i2c_address );
-    wire.write( 0xFD );
-    wire.write( framenumber );
-    wire.endTransmission();
-
-    // now update our current frame number
-    _currentframe = framenumber;
-
-    // all done, return to caller.
-    return;
-    
-}
-
-
-
-
-
-
-
-
-/// @brief Write a single byte of data to the chip.
-/// @param framenumber The number of the frame to write to. 0x00-0x07 Animation. 0x0B Control.
-/// @param address The address within the frame to write to.
-/// @param data The data byte to write to the chip.
-void Pimoroni_5x5_rgb_matrix::_chipwritebyte( uint8_t framenumber , uint8_t address , uint8_t data ) {
-
-
-    _switchFrame( framenumber );
-
-    // say hello to the chip again...
-    wire.beginTransmission( _i2c_address );
-
-    // send the address
-    wire.write( address );
-
-    // send the data
-    wire.write( data );
-
-    // say goodbye
-    wire.endTransmission();
-
-    // all done, return to caller
-    return;
-    
-}
-
-
-/// @brief Read a single byte of data from the chip.
-/// @param framenumber The number of the frame to read from. 0x00-0x07 Animation. 0x0B Control.
-/// @param address The address within the frame to read from.
-/// @return The data byte rturned from the chip as a uint8_t.
-uint8_t Pimoroni_5x5_rgb_matrix::_chipreadbyte( uint8_t framenumber , uint8_t address ) {
-
-    _switchFrame( framenumber );
-
-    // say hello to the chip again...
-    wire.beginTransmission( _i2c_address );
-    
-    // send the address
-    wire.write( address );
-
-    // say goodye to the chip
-    wire.endTransmission();
-
-    // request one byte back from the chip
-    wire.requestFrom( _i2c_address , (uint8_t)(0x01) );
-
-    // wait until that byte is available.
-    while( !wire.available() ) { delay(1); };
-
-    // receive one byte back from the chip and return it as a uint8_t.
-    return (uint8_t)( wire.read() );
-
-}
 
 
 
@@ -556,7 +473,7 @@ void Pimoroni_5x5_rgb_matrix::pixelpwmStateBufferFill( uint8_t statebyte ) {
 void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
 
     // now write to chip.
-    _switchFrame( framenumber );
+    // IS31FL3731::_switchFrame( framenumber );
 
     // say hello to the chip again...
     wire.beginTransmission( _i2c_address );
@@ -643,7 +560,7 @@ void Pimoroni_5x5_rgb_matrix::frameWrite( uint8_t framenumber ) {
 void Pimoroni_5x5_rgb_matrix::frameWritePixelState( uint8_t framenumber ) {
 
     // now write to chip.
-    _switchFrame( framenumber );
+    // _switchFrame( framenumber );
 
     // say hello to the chip again...
     wire.beginTransmission( _i2c_address );

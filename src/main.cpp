@@ -29,7 +29,7 @@ IS31FL3731 myisobs;
 
 //#include <pimoroni_11x7matrix.h>
 
-#include <Pimoroni_5x5_rgb_matrix.h>
+// #include <Pimoroni_5x5_rgb_matrix.h>
 
 
 
