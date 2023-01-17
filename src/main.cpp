@@ -23,11 +23,7 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 // include my IS31FL3731 library
 #include <IS31FL3731.h>
 
-IS31FL3731 myisobs;
 
-
-
-//#include <pimoroni_11x7matrix.h>
 
 // #include <Pimoroni_5x5_rgb_matrix.h>
 
@@ -124,45 +120,49 @@ void menucommand_01() {
   lcd.setCursor( 0 , 0 );
   lcd.print( "Test 1" );
   
+  IS31FL3731 myisobj;
 
-  // // create the object.
-  // Pimoroni_5x5_rgb_matrix myledmatrix( IS31FL3731_I2C_ADDRESS );
+  myisobj.begin( IS31FL3731_I2C_ADDRESS );
 
-  // // initialise the chip.
-  // myledmatrix.begin( IS31FL3731_I2C_ADDRESS );
+  myisobj.softwareShutdownSet( 1 );
 
-  // // turn it on
-  // myledmatrix.softwareShutdownSet( 1 );
-  
-  // // switch to static picture mode.
-  // myledmatrix.displayModeSet( 0b00 );
+  myisobj.displayModeSet( 0b00 );
 
-  // // switch to frame 0
-  // myledmatrix.frameDisplayPointerSet( 0 );
+  myisobj.frameDisplayPointerSet( 0 );
 
   
-
-  // // try out some pixel commands
-  
-  // myledmatrix.pixelpwmStateBufferFill( 0x40 );
-  // myledmatrix.frameWrite( 0 );
-
-
-  // while (1) {
-  //   for ( uint8_t colour = 0 ; colour < 3 ; colour++ ) {
-  //     for ( uint8_t xpos = 0 ; xpos < 5 ; xpos++ ) {
-  //       for ( uint8_t ypos = 0 ; ypos < 5 ; ypos++ ) {
-  //         myledmatrix.pixelStateBufferClear();
-  //         myledmatrix.pixelSet( xpos , ypos , colour , 1 );
-  //         myledmatrix.frameWritePixelState( 0 );
-  //         //delay( 100 );
-  //       }
-  //     }
-  //   }
-  // }
+  // create a blank buffer
+  uint8_t testbuffer[ 18 ] = { 0};
+  for ( uint8_t i = 0 ; i < 18 ; i++ ) {
+    testbuffer[ i ] = 0xFF;
+  }
+  myisobj.frameWriteState( 0 , testbuffer );
 
 
-  
+  // blink buffer
+  uint8_t testblinkbuffer[ 18 ] = { 0 };
+  for ( uint8_t i = 0 ; i < 18 ; i++ ) {
+    testblinkbuffer[ i ] = 0x00;
+  }
+  myisobj.frameWriteBlink( 0 , testblinkbuffer );
+
+
+
+
+  // create a pwm buffer
+  uint8_t testpwmbuffer[ 18 * 8 ] = { 0 };
+  for ( uint8_t i = 0 ; i < ( 18 * 8 ) ; i++ ) {
+    testpwmbuffer[ i ] = 0x04;
+  }
+  myisobj.frameWritepwm( 0 , testpwmbuffer );
+
+
+
+  lcd.setCursor( 0 , 1 );
+  lcd.print( "Done!" );
+  delay( 1000 );
+  return;
+
 }
 
 

@@ -1,6 +1,6 @@
 
-#ifndef IS31FL3731_HEADER_GUARD
-#define IS31FL3731_HEADER_GUARD
+#ifndef _IS31FL3731_HEADER_GUARD
+#define _IS31FL3731_HEADER_GUARD
 
 
 
@@ -9,10 +9,11 @@
 // include Arduino header
 #include <Arduino.h>
 
+#ifndef wire
 // Wire library
 #include <Wire.h>
 #define wire Wire
-
+#endif
 
 
 
@@ -38,8 +39,8 @@
 
 // frame buffer addresses
 #define IS31FL3731_ADDRESS_FRAME_BUFFER_STATE 0x00
-#define IS31FL3731_ADDRESS_FRAME_BUFFER_BLINK 0x00
-#define IS31FL3731_ADDRESS_FRAME_BUFFER_PWM 0x00
+#define IS31FL3731_ADDRESS_FRAME_BUFFER_BLINK 0x12
+#define IS31FL3731_ADDRESS_FRAME_BUFFER_PWM 0x24
 
 
 
@@ -93,7 +94,7 @@ class IS31FL3731 {
         void begin( uint8_t i2c_address );
 
 
-        // add frame write commands
+        // frame write commands
         // just take a pointer to the right sized array and blit it to the right frame.
         // let the parent handle the mapping and pixel buffering.
 
