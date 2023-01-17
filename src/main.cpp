@@ -21,10 +21,13 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
 
 // include my IS31FL3731 library
-//#include <IS31FL3731.h>
+#include <IS31FL3731.h>
+
+IS31FL3731 myisobs;
+
+
 
 //#include <pimoroni_11x7matrix.h>
-
 
 #include <Pimoroni_5x5_rgb_matrix.h>
 
